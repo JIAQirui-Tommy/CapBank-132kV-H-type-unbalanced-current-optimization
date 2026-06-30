@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <p class="project-label">Independent project: 132kV H Type Unbalanced Current</p>
+          <h1>132kV H Type 96 Capacitor Bank</h1>
+          <p>
+            A/B are the top left/right arms, C/D are the bottom left/right arms.
+            Each arm has 24 capacitors: 4 in parallel per group, 6 groups in series.
+          </p>
+        </div>
+        <div class="actions">
+          <button id="loadExample" type="button">Example</button>
+          <button id="resetAll" type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="notice">
+        <strong>Separated from the 18 cap double-star project.</strong>
+        This folder and page are only for the 132kV H type, 96 capacitor configuration.
+      </section>
+
+      <section class="settings">
+        <label>
+          <span>System voltage kV</span>
+          <input id="systemVoltage" type="number" value="132" min="0" step="0.1" />
+        </label>
+        <label>
+          <span>Voltage basis</span>
+          <select id="voltageBasis">
+            <option value="phase" selected>Line-to-neutral, V = kV / sqrt(3)</option>
+            <option value="direct">Direct across H bridge</option>
+          </select>
+        </label>
+        <label>
+          <span>Frequency Hz</span>
+          <input id="frequency" type="number" value="50" min="0" step="1" />
+        </label>
+        <label>
+          <span>Nominal capacitance uF</span>
+          <input id="nominalCap" type="number" value="22" min="0" step="0.01" />
+        </label>
+        <label>
+          <span>Swap pairs</span>
+          <select id="swapPairs">
+            <option value="1">1 pair</option>
+            <option value="2">2 pairs</option>
+            <option value="3" selected>3 pairs</option>
+            <option value="4">4 pairs</option>
+            <option value="5">5 pairs</option>
+            <option value="6">6 pairs</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="metrics" aria-live="polite">
+        <article>
+          <span>Current unbalanced current</span>
+          <strong id="currentUnbalance">0.000 mA</strong>
+        </article>
+        <article>
+          <span>After recommended swaps</span>
+          <strong id="bestUnbalance">0.000 mA</strong>
+        </article>
+        <article>
+          <span>Improvement</span>
+          <strong id="improvement">0.0%</strong>
+        </article>
+        <article>
+          <span>Bridge balance error</span>
+          <strong id="balanceError">0.0000%</strong>
+        </article>
+      </section>
+
+      <section class="main-grid">
+        <section class="bridge-panel" aria-label="H type capacitor bridge">
+          <div class="bridge-heading">
+            <h2>H Type Layout</h2>
+            <div class="button-row">
+              <button id="optimize" type="button">Optimize swaps</button>
+              <button id="applyBest" type="button" disabled>Apply</button>
+              <button id="exportCsv" type="button" disabled>Export CSV</button>
+            </div>
+          </div>
+          <div class="bridge-diagram">
+            <div class="bus top-bus">132kV source</div>
+            <div class="arms" id="arms"></div>
+            <div class="relay-line"><span>relay / CT branch, approximate short-circuit model</span></div>
+            <div class="bus bottom-bus">neutral / ground</div>
+          </div>
+        </section>
+
+        <aside class="side">
+          <section class="panel">
+            <h2>Swap Recommendation</h2>
+            <ol id="swapList" class="swap-list"></ol>
+          </section>
+
+          <section class="panel">
+            <h2>Best By Number Of Swap Pairs</h2>
+            <div id="depthTable" class="depth-table"></div>
+          </section>
+
+          <section class="panel">
+            <h2>Calculation Details</h2>
+            <div id="details" class="details"></div>
+          </section>
+        </aside>
+      </section>
+
+      <section class="formula">
+        <h2>Calculation Model</h2>
+        <p>
+          Parallel group: <code>G = C1 + C2 + C3 + C4</code>. Arm capacitance:
+          <code>Carm = 1 / (1/G1 + ... + 1/G6)</code>. With relay treated as an
+          approximate short, top arms A/B are in parallel and bottom arms C/D are in
+          parallel. The displayed unbalanced current is
+          <code>|IA - IC|</code>, equivalent to
+          <code>wV |CA*CD - CB*CC| / (CA + CB + CC + CD)</code>.
+        </p>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
