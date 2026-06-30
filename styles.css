@@ -322,6 +322,7 @@ select {
 .cap-slot {
   display: grid;
   gap: 6px;
+  min-width: 0;
   padding: 8px;
   border-right: 1px solid #ecf0f4;
 }
@@ -369,19 +370,23 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
   font-size: 12px;
 }
 
 .cap-id {
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .cap-position {
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .cap-slot input {
   height: 32px;
+  min-width: 0;
 }
 
 .relay-line {
@@ -683,6 +688,7 @@ code {
 
   .cap-position {
     font-size: 10px;
+    display: none;
   }
 
   .cap-slot input {
@@ -759,7 +765,7 @@ code {
   }
 
   .group {
-    grid-template-columns: 36px repeat(4, minmax(0, 1fr));
+    grid-template-columns: 34px repeat(4, minmax(0, 1fr));
   }
 
   .cap-slot {
