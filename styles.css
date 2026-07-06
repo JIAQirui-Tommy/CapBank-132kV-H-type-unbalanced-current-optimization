@@ -74,15 +74,6 @@ button:disabled {
   margin-bottom: 14px;
 }
 
-.project-label {
-  margin: 0 0 6px;
-  color: var(--accent);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 12px;
-}
-
 h1,
 h2,
 p {
@@ -99,7 +90,7 @@ h2 {
   font-size: 16px;
 }
 
-.topbar p:not(.project-label),
+.topbar p,
 .formula p {
   margin-top: 8px;
   color: var(--muted);
@@ -114,7 +105,6 @@ h2 {
   justify-content: flex-end;
 }
 
-.notice,
 .settings,
 .metrics,
 .bridge-panel,
@@ -124,17 +114,6 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
-}
-
-.notice {
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.notice strong {
-  color: var(--ink);
 }
 
 .settings {
@@ -590,7 +569,7 @@ code {
     gap: 12px;
   }
 
-  .topbar p:not(.project-label) {
+  .topbar p {
     font-size: 13px;
     line-height: 1.45;
   }
@@ -744,11 +723,6 @@ code {
 
   h2 {
     font-size: 15px;
-  }
-
-  .notice {
-    font-size: 12px;
-    padding: 10px;
   }
 
   .settings {
