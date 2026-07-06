@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
-    <link rel="stylesheet" href="./styles.css?v=clean-header-rebuild-20260706" />
+    <link rel="stylesheet" href="./styles.css?v=three-phase-a-20260706" />
   </head>
   <body>
     <main class="app">
@@ -17,10 +17,10 @@
           </p>
         </div>
         <div class="actions">
-          <button id="loadFile" type="button">Load Excel/CSV</button>
+          <button id="loadFile" type="button">Load Current Phase</button>
           <input id="fileInput" type="file" accept=".xlsx,.xls,.csv,.txt" hidden />
           <button id="loadExample" type="button">Example</button>
-          <button id="resetAll" type="button">Reset</button>
+          <button id="resetAll" type="button">Reset Phase</button>
         </div>
       </header>
 
@@ -59,6 +59,15 @@
       </section>
       <p id="fileStatus" class="file-status" aria-live="polite"></p>
 
+      <section class="phase-board" aria-label="Phase selection and summary">
+        <div class="phase-tabs" role="tablist" aria-label="Phase selector">
+          <button class="phase-tab is-active" type="button" data-phase="L1" role="tab" aria-selected="true">L1</button>
+          <button class="phase-tab" type="button" data-phase="L2" role="tab" aria-selected="false">L2</button>
+          <button class="phase-tab" type="button" data-phase="L3" role="tab" aria-selected="false">L3</button>
+        </div>
+        <div id="phaseOverview" class="phase-overview" aria-live="polite"></div>
+      </section>
+
       <section class="metrics" aria-live="polite">
         <article>
           <span>Current unbalanced current</span>
@@ -89,10 +98,10 @@
             </div>
           </div>
           <div class="bridge-diagram">
-            <div class="bus top-bus">132kV source</div>
+            <div class="bus top-bus"><span class="activePhaseLabel">L1</span> 132kV source</div>
             <div class="arms" id="arms"></div>
             <div class="relay-line"><span>relay / CT branch, approximate short-circuit model</span></div>
-            <div class="bus bottom-bus">neutral / ground</div>
+            <div class="bus bottom-bus"><span class="activePhaseLabel">L1</span> neutral / ground</div>
           </div>
         </section>
 
@@ -128,6 +137,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./app.js?v=display-zero-stop-rebuild-20260706"></script>
+    <script src="./app.js?v=three-phase-a-20260706"></script>
   </body>
 </html>

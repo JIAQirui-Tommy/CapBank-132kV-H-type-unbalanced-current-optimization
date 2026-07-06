@@ -1,4 +1,5 @@
 const ARM_ORDER = ["C1", "C2", "C3", "C4"];
+const PHASE_ORDER = ["L1", "L2", "L3"];
 const ARM_LABELS = {
   C1: "C1 top left",
   C2: "C2 bottom left",
@@ -12,6 +13,8 @@ const TOTAL_CAPS = ARM_ORDER.length * CAPS_PER_ARM;
 const MIN_USEFUL_IMPROVEMENT_MA = 0.001;
 
 const armsEl = document.querySelector("#arms");
+const phaseOverviewEl = document.querySelector("#phaseOverview");
+const activePhaseLabelEls = document.querySelectorAll(".activePhaseLabel");
 const systemVoltageEl = document.querySelector("#systemVoltage");
 const voltageBasisEl = document.querySelector("#voltageBasis");
 const frequencyEl = document.querySelector("#frequency");
@@ -32,7 +35,11 @@ const exportCsvEl = document.querySelector("#exportCsv");
 let capacitors = [];
 let lastBest = null;
 let lastRecord = null;
+let lastOptimizationResult = null;
 let movedIds = new Map();
+let currentPhase = "L1";
+let phaseStates = {};
+let isPhaseSwitching = false;
 
 function readNumber(el, fallback) {
   const value = Number.parseFloat(el.value);
@@ -64,6 +71,76 @@ function makeDefaultCaps() {
     id: makeCapId(index),
     uf: nominal,
   }));
+}
+
+function makePhaseState() {
+  return {
+    capacitors: makeDefaultCaps(),
+    lastBest: null,
+    lastRecord: null,
+    lastOptimizationResult: null,
+    movedIds: new Map(),
+  };
+}
+
+function saveCurrentPhaseState({ readInputs = true } = {}) {
+  if (!phaseStates[currentPhase]) return;
+  if (readInputs && capacitors.length === TOTAL_CAPS && armsEl.children.length > 0) {
+    syncFromInputs();
+  }
+  phaseStates[currentPhase] = {
+    capacitors: capacitors.map((cap) => ({ ...cap })),
+    lastBest,
+    lastRecord,
+    lastOptimizationResult,
+    movedIds: new Map(movedIds),
+  };
+}
+
+function loadPhaseState(phase) {
+  const state = phaseStates[phase] || makePhaseState();
+  phaseStates[phase] = state;
+  capacitors = state.capacitors.map((cap) => ({ ...cap }));
+  lastBest = state.lastBest;
+  lastRecord = state.lastRecord;
+  lastOptimizationResult = state.lastOptimizationResult;
+  movedIds = new Map(state.movedIds);
+  currentPhase = phase;
+}
+
+function resetCurrentPhaseResult() {
+  lastBest = null;
+  lastRecord = null;
+  lastOptimizationResult = null;
+  movedIds = new Map();
+  applyBestEl.disabled = true;
+  exportCsvEl.disabled = true;
+  swapListEl.innerHTML = "";
+  depthTableEl.innerHTML = "";
+}
+
+function restorePhaseResult() {
+  if (lastOptimizationResult) {
+    renderOptimization(lastOptimizationResult);
+    return;
+  }
+  swapListEl.innerHTML = "";
+  depthTableEl.innerHTML = "";
+  applyBestEl.disabled = true;
+  exportCsvEl.disabled = true;
+  renderLayout();
+  updateSummary();
+}
+
+function setPhaseUi() {
+  document.querySelectorAll(".phase-tab").forEach((button) => {
+    const isActive = button.dataset.phase === currentPhase;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+  activePhaseLabelEls.forEach((el) => {
+    el.textContent = currentPhase;
+  });
 }
 
 function formatMA(value) {
@@ -169,6 +246,37 @@ function calculate(layout, system = getSystem()) {
     bridgeFormulaA,
     system,
   };
+}
+
+function renderPhaseOverview() {
+  if (!phaseOverviewEl) return;
+  const system = getSystem();
+  phaseOverviewEl.innerHTML = PHASE_ORDER.map((phase) => {
+    const state = phase === currentPhase
+      ? { capacitors, lastBest }
+      : phaseStates[phase] || makePhaseState();
+    const current = calculate(state.capacitors, system);
+    const best = state.lastBest ? calculate(state.lastBest.layout, system) : current;
+    const isActive = phase === currentPhase ? " is-active" : "";
+    return `
+      <button class="phase-summary${isActive}" type="button" data-phase-jump="${phase}">
+        <span>${phase}</span>
+        <strong>${formatMA(current.unbalanceMA)}</strong>
+        <small>best ${formatMA(best.unbalanceMA)}</small>
+      </button>
+    `;
+  }).join("");
+}
+
+function switchPhase(phase) {
+  if (!PHASE_ORDER.includes(phase) || phase === currentPhase) return;
+  isPhaseSwitching = true;
+  saveCurrentPhaseState();
+  loadPhaseState(phase);
+  setPhaseUi();
+  restorePhaseResult();
+  setFileStatus(`Showing ${currentPhase}. Load Excel/CSV will fill ${currentPhase} only.`);
+  isPhaseSwitching = false;
 }
 
 function renderLayout() {
@@ -360,6 +468,10 @@ function updateSummary(bestState = lastBest) {
   });
 
   renderDetails(current);
+  if (!isPhaseSwitching) {
+    saveCurrentPhaseState({ readInputs: false });
+  }
+  renderPhaseOverview();
 }
 
 function buildSwapRows(initial, swaps) {
@@ -464,16 +576,12 @@ function applyLoadedValues(values, sourceName) {
     id: makeCapId(index),
     uf: Number(uf),
   }));
-  lastBest = null;
-  lastRecord = null;
-  movedIds = new Map();
-  applyBestEl.disabled = true;
-  exportCsvEl.disabled = true;
+  resetCurrentPhaseResult();
   swapListEl.innerHTML = "";
   depthTableEl.innerHTML = "";
   renderLayout();
   updateSummary();
-  setFileStatus(`Loaded 96 capacitance values from ${sourceName}.`);
+  setFileStatus(`Loaded 96 capacitance values from ${sourceName} into ${currentPhase}.`);
 }
 
 async function loadDataFile(file) {
@@ -503,7 +611,8 @@ function createRecord(bestState) {
   const after = calculate(finalLayout);
   const swaps = swapsFromState(bestState);
   return {
-    title: "132kV H Type 96 Capacitor Bank Unbalanced Current",
+    title: `132kV H Type 96 Capacitor Bank Unbalanced Current - ${currentPhase}`,
+    phase: currentPhase,
     createdAt: new Date().toISOString(),
     voltageKv: readNumber(systemVoltageEl, 132),
     voltageBasis: voltageBasisEl.value,
@@ -521,6 +630,7 @@ function createRecord(bestState) {
 }
 
 function renderOptimization(result) {
+  lastOptimizationResult = result;
   lastBest = result.best;
   lastRecord = createRecord(result.best);
 
@@ -571,6 +681,7 @@ function renderOptimization(result) {
 
   renderLayout();
   updateSummary(result.best);
+  saveCurrentPhaseState({ readInputs: false });
 
   applyBestEl.disabled = swaps.length === 0;
   exportCsvEl.disabled = false;
@@ -600,6 +711,7 @@ function exportRecord() {
   if (!lastRecord) return;
   const summary = [
     [lastRecord.title],
+    ["Phase", lastRecord.phase],
     ["Created At", lastRecord.createdAt],
     ["Voltage kV", lastRecord.voltageKv],
     ["Voltage Basis", lastRecord.voltageBasis],
@@ -640,7 +752,7 @@ function exportRecord() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `132kv-h-type-96cap-unbalanced-current-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `132kv-h-type-96cap-${lastRecord.phase.toLowerCase()}-unbalanced-current-${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -657,34 +769,22 @@ function loadExample() {
       uf: Number((nominal * (1 + wave + drift)).toFixed(4)),
     };
   });
-  lastBest = null;
-  lastRecord = null;
-  movedIds = new Map();
-  applyBestEl.disabled = true;
-  exportCsvEl.disabled = true;
+  resetCurrentPhaseResult();
   renderLayout();
   updateSummary();
+  setFileStatus(`Example data loaded into ${currentPhase}.`);
 }
 
 function resetAll() {
   capacitors = makeDefaultCaps();
-  lastBest = null;
-  lastRecord = null;
-  movedIds = new Map();
-  applyBestEl.disabled = true;
-  exportCsvEl.disabled = true;
-  swapListEl.innerHTML = "";
-  depthTableEl.innerHTML = "";
+  resetCurrentPhaseResult();
   renderLayout();
   updateSummary();
+  setFileStatus(`${currentPhase} reset to nominal capacitance.`);
 }
 
 armsEl.addEventListener("input", () => {
-  lastBest = null;
-  lastRecord = null;
-  movedIds = new Map();
-  applyBestEl.disabled = true;
-  exportCsvEl.disabled = true;
+  resetCurrentPhaseResult();
   updateSummary();
 });
 
@@ -704,6 +804,16 @@ swapPairsEl.addEventListener("change", () => {
 document.querySelector("#optimize").addEventListener("click", () => {
   syncFromInputs();
   renderOptimization(optimizeLayout(capacitors, swapPairsEl.value));
+});
+
+document.querySelectorAll(".phase-tab").forEach((button) => {
+  button.addEventListener("click", () => switchPhase(button.dataset.phase));
+});
+
+phaseOverviewEl.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-phase-jump]");
+  if (!button) return;
+  switchPhase(button.dataset.phaseJump);
 });
 
 document.querySelector("#loadFile").addEventListener("click", () => {
@@ -736,13 +846,20 @@ applyBestEl.addEventListener("click", () => {
   });
   capacitors = lastBest.layout.map((cap) => ({ ...cap }));
   lastBest = null;
+  lastOptimizationResult = null;
   applyBestEl.disabled = true;
   renderLayout();
   updateSummary();
+  saveCurrentPhaseState({ readInputs: false });
 });
 
 exportCsvEl.addEventListener("click", exportRecord);
 document.querySelector("#loadExample").addEventListener("click", loadExample);
 document.querySelector("#resetAll").addEventListener("click", resetAll);
 
-resetAll();
+phaseStates = Object.fromEntries(PHASE_ORDER.map((phase) => [phase, makePhaseState()]));
+loadPhaseState(currentPhase);
+setPhaseUi();
+renderLayout();
+updateSummary();
+setFileStatus(`Showing ${currentPhase}. Load Excel/CSV will fill ${currentPhase} only.`);
