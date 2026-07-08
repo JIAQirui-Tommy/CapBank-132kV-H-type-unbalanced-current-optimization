@@ -22,6 +22,7 @@ const nominalCapEl = document.querySelector("#nominalCap");
 const swapPairsEl = document.querySelector("#swapPairs");
 const fileInputEl = document.querySelector("#fileInput");
 const fileStatusEl = document.querySelector("#fileStatus");
+const downloadTemplateEl = document.querySelector("#downloadTemplate");
 const currentUnbalanceEl = document.querySelector("#currentUnbalance");
 const bestUnbalanceEl = document.querySelector("#bestUnbalance");
 const improvementEl = document.querySelector("#improvement");
@@ -707,6 +708,54 @@ function csvEscape(value) {
   return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function buildTemplateRows() {
+  const nominal = readNumber(nominalCapEl, 21.89);
+  const rows = [["ID", "Section", "Group", "Slot", "Capacitance_uF"]];
+  for (let index = 0; index < TOTAL_CAPS; index += 1) {
+    const meta = capMeta(index);
+    rows.push([
+      index + 1,
+      meta.arm,
+      `G${meta.groupIndex + 1}`,
+      meta.slotIndex + 1,
+      Number(nominal.toFixed(6)),
+    ]);
+  }
+  return rows;
+}
+
+function downloadTemplate() {
+  const rows = buildTemplateRows();
+  const stamp = new Date().toISOString().slice(0, 10);
+  const baseName = `132kv-h-type-96cap-${currentPhase.toLowerCase()}-template-${stamp}`;
+
+  if (window.XLSX) {
+    const workbook = window.XLSX.utils.book_new();
+    const worksheet = window.XLSX.utils.aoa_to_sheet(rows);
+    worksheet["!cols"] = [{ wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 18 }];
+    window.XLSX.utils.book_append_sheet(workbook, worksheet, `${currentPhase} Template`);
+    window.XLSX.writeFile(workbook, `${baseName}.xlsx`);
+    setFileStatus(`Downloaded ${currentPhase} Excel template.`);
+    return;
+  }
+
+  const csv = rows.map((row) => row.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  downloadBlob(blob, `${baseName}.csv`);
+  setFileStatus(`Downloaded ${currentPhase} CSV template because Excel support is not available.`);
+}
+
 function exportRecord() {
   if (!lastRecord) return;
   const summary = [
@@ -749,14 +798,10 @@ function exportRecord() {
     .map((row) => row.map(csvEscape).join(","))
     .join("\n");
   const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `132kv-h-type-96cap-${lastRecord.phase.toLowerCase()}-unbalanced-current-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  downloadBlob(
+    blob,
+    `132kv-h-type-96cap-${lastRecord.phase.toLowerCase()}-unbalanced-current-${new Date().toISOString().slice(0, 10)}.csv`,
+  );
 }
 
 function loadExample() {
@@ -819,6 +864,8 @@ phaseOverviewEl.addEventListener("click", (event) => {
 document.querySelector("#loadFile").addEventListener("click", () => {
   fileInputEl.click();
 });
+
+downloadTemplateEl.addEventListener("click", downloadTemplate);
 
 fileInputEl.addEventListener("change", async () => {
   const file = fileInputEl.files?.[0];
