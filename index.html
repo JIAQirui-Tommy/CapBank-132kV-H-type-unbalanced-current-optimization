@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
-    <link rel="stylesheet" href="./styles.css?v=ct-visual-guide-20260713" />
+    <link rel="stylesheet" href="./styles.css?v=ct-visual-compact-20260713" />
   </head>
   <body>
     <main class="app">
@@ -29,13 +29,6 @@
         <label>
           <span>System voltage kV</span>
           <input id="systemVoltage" type="number" value="132" min="0" step="0.1" />
-        </label>
-        <label>
-          <span>Voltage basis</span>
-          <select id="voltageBasis">
-            <option value="phase" selected>Line-to-neutral, V = kV / sqrt(3)</option>
-            <option value="direct">Direct across H bridge</option>
-          </select>
         </label>
         <label>
           <span>Frequency Hz</span>
@@ -211,6 +204,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./app.js?v=ct-visual-guide-20260713"></script>
+    <script src="./app.js?v=ct-visual-compact-20260713"></script>
   </body>
 </html>

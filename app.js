@@ -16,7 +16,6 @@ const armsEl = document.querySelector("#arms");
 const phaseOverviewEl = document.querySelector("#phaseOverview");
 const activePhaseLabelEls = document.querySelectorAll(".activePhaseLabel");
 const systemVoltageEl = document.querySelector("#systemVoltage");
-const voltageBasisEl = document.querySelector("#voltageBasis");
 const frequencyEl = document.querySelector("#frequency");
 const nominalCapEl = document.querySelector("#nominalCap");
 const ctRatioEl = document.querySelector("#ctRatio");
@@ -175,9 +174,8 @@ function getSystem() {
   const kv = readNumber(systemVoltageEl, 132);
   const ctRatio = Math.max(readNumber(ctRatioEl, 1), 0.000001);
   return {
-    sourceVoltage: (voltageBasisEl.value === "phase" ? kv / Math.sqrt(3) : kv) * 1000,
+    sourceVoltage: (kv / Math.sqrt(3)) * 1000,
     displayKv: kv,
-    basis: voltageBasisEl.value,
     frequency: readNumber(frequencyEl, 50),
     ctRatio,
   };
@@ -611,7 +609,6 @@ function createRecord(bestState) {
     phase: currentPhase,
     createdAt: new Date().toISOString(),
     voltageKv: readNumber(systemVoltageEl, 132),
-    voltageBasis: voltageBasisEl.value,
     frequency: readNumber(frequencyEl, 50),
     ctRatio: getSystem().ctRatio,
     swapMode: swapPairsEl.value,
@@ -761,7 +758,6 @@ function exportRecord() {
     ["Phase", lastRecord.phase],
     ["Created At", lastRecord.createdAt],
     ["Voltage kV", lastRecord.voltageKv],
-    ["Voltage Basis", lastRecord.voltageBasis],
     ["Frequency Hz", lastRecord.frequency],
     ["CT Ratio X:1", lastRecord.ctRatio],
     ["Swap Mode", lastRecord.swapMode],
@@ -834,7 +830,7 @@ armsEl.addEventListener("input", () => {
   updateSummary();
 });
 
-[systemVoltageEl, voltageBasisEl, frequencyEl, nominalCapEl, ctRatioEl].forEach((el) => {
+[systemVoltageEl, frequencyEl, nominalCapEl, ctRatioEl].forEach((el) => {
   el.addEventListener("input", () => updateSummary(lastBest));
   el.addEventListener("change", () => updateSummary(lastBest));
 });
