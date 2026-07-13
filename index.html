@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
-    <link rel="stylesheet" href="./styles.css?v=visual-labels-20260713" />
+    <link rel="stylesheet" href="./styles.css?v=unified-physical-labels-20260713" />
   </head>
   <body>
     <main class="app">
@@ -12,8 +12,8 @@
         <div>
           <h1>132kV H Type 96 Capacitor Bank</h1>
           <p>
-            C1/C2/C3/C4 form the H bridge: C1 top left, C2 bottom left,
-            C3 top right, and C4 bottom right. Capacitors are numbered 1-96.
+            C1/C2/C3/C4 form the H bridge: C1 front top, C2 front bottom,
+            C3 rear top, and C4 rear bottom. Capacitors are numbered 1-96.
           </p>
         </div>
         <div class="actions">
@@ -89,7 +89,7 @@
         <div class="visual-heading">
           <h2>Visual Guide</h2>
           <p>
-            Physical view: C1/C2 are on the front side, C3/C4 are on the back side.
+            Physical view: C1/C2 are on the front side, C3/C4 are on the rear side.
             Each section has 6 groups: two groups side by side, three rows high.
             Each group contains four parallel capacitor units.
           </p>
@@ -122,11 +122,11 @@
               </article>
             </div>
           </section>
-          <section class="rack-face" aria-label="Back side">
-            <div class="face-title">Back</div>
+          <section class="rack-face" aria-label="Rear side">
+            <div class="face-title">Rear</div>
             <div class="face-stack">
               <article class="physical-arm">
-                <header><strong>C3</strong><span>back top</span></header>
+                <header><strong>C3</strong><span>rear top</span></header>
                 <div class="physical-groups">
                   <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
                   <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
@@ -137,7 +137,7 @@
                 </div>
               </article>
               <article class="physical-arm">
-                <header><strong>C4</strong><span>back bottom</span></header>
+                <header><strong>C4</strong><span>rear bottom</span></header>
                 <div class="physical-groups">
                   <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
                   <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
@@ -204,6 +204,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./app.js?v=visual-labels-20260713"></script>
+    <script src="./app.js?v=unified-physical-labels-20260713"></script>
   </body>
 </html>
