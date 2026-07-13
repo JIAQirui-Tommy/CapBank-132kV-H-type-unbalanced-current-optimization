@@ -104,6 +104,7 @@ h2 {
 .settings,
 .phase-board,
 .metrics,
+.visual-guide,
 .bridge-panel,
 .panel,
 .formula {
@@ -115,7 +116,7 @@ h2 {
 
 .settings {
   display: grid;
-  grid-template-columns: repeat(5, minmax(135px, 1fr));
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
   gap: 12px;
   padding: 14px;
   margin-bottom: 14px;
@@ -217,6 +218,156 @@ select {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   overflow: hidden;
   margin-bottom: 14px;
+}
+
+.visual-guide {
+  padding: 15px;
+  margin-bottom: 14px;
+}
+
+.visual-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.visual-heading p {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.rack-guide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rack-face {
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fbfcfd;
+}
+
+.rack-face:first-child {
+  border-color: #1b3f5f;
+}
+
+.rack-face:last-child {
+  border-color: #3f3421;
+}
+
+.face-title {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-weight: 900;
+  text-align: center;
+}
+
+.rack-face:first-child .face-title {
+  background: #1b3f5f;
+}
+
+.rack-face:last-child .face-title {
+  background: #3f3421;
+}
+
+.face-stack {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.physical-arm {
+  border: 1px solid #e2e8ef;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.physical-arm header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #ecf0f4;
+}
+
+.physical-arm header strong {
+  font-size: 18px;
+}
+
+.physical-arm header span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.physical-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  padding: 10px;
+}
+
+.physical-group {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(18px, 1fr));
+  gap: 6px;
+  align-items: center;
+  justify-items: center;
+  min-height: 78px;
+  padding: 7px 8px;
+  border: 1px solid #dce5ee;
+  border-radius: 6px;
+  background: #f8fafc;
+  position: relative;
+}
+
+.physical-group span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  justify-self: start;
+}
+
+.physical-group i {
+  display: block;
+  width: min(22px, 100%);
+  height: 44px;
+  border: 2px solid #546679;
+  border-radius: 5px;
+  background: #fff;
+  position: relative;
+}
+
+.physical-group i::before,
+.physical-group i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #546679;
+  border-radius: 50%;
+  background: #fff;
+  transform: translateX(-50%);
+}
+
+.physical-group i::before {
+  top: 7px;
+}
+
+.physical-group i::after {
+  bottom: 7px;
 }
 
 .metrics article {
@@ -605,6 +756,12 @@ code {
   }
 }
 
+@media (orientation: landscape) and (min-width: 760px) {
+  .rack-guide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 920px) {
   body {
     background: #eef2f5;
@@ -658,6 +815,19 @@ code {
   }
 
   .phase-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-heading {
+    display: grid;
+  }
+
+  .visual-heading p {
+    max-width: none;
+    text-align: left;
+  }
+
+  .rack-guide {
     grid-template-columns: 1fr;
   }
 
@@ -791,6 +961,35 @@ code {
 
   .settings {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .visual-guide {
+    padding: 11px;
+  }
+
+  .face-stack {
+    padding: 8px;
+  }
+
+  .physical-groups {
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .physical-group {
+    min-height: 72px;
+    padding: 6px;
+  }
+
+  .physical-group i {
+    width: 18px;
+    height: 38px;
+  }
+
+  .physical-group i::before,
+  .physical-group i::after {
+    width: 8px;
+    height: 8px;
   }
 
   label {

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
-    <link rel="stylesheet" href="./styles.css?v=template-black-arms-20260708" />
+    <link rel="stylesheet" href="./styles.css?v=ct-visual-guide-20260713" />
   </head>
   <body>
     <main class="app">
@@ -46,6 +46,10 @@
           <input id="nominalCap" type="number" value="21.89" min="0" step="0.01" />
         </label>
         <label>
+          <span>CT ratio X:1</span>
+          <input id="ctRatio" type="number" value="1" min="0.000001" step="1" />
+        </label>
+        <label>
           <span>Swap pairs</span>
           <select id="swapPairs">
             <option value="auto" selected>Auto: fewest pairs for best</option>
@@ -71,21 +75,88 @@
 
       <section class="metrics" aria-live="polite">
         <article>
-          <span>Current unbalanced current</span>
-          <strong id="currentUnbalance">0.000 mA</strong>
+          <span>Primary unbalanced current</span>
+          <strong id="primaryUnbalance">0.000 mA</strong>
         </article>
         <article>
-          <span>After recommended swaps</span>
-          <strong id="bestUnbalance">0.000 mA</strong>
+          <span>Secondary relay current</span>
+          <strong id="secondaryUnbalance">0.000 mA</strong>
         </article>
         <article>
-          <span>Improvement</span>
-          <strong id="improvement">0.0%</strong>
+          <span>After swaps primary</span>
+          <strong id="bestPrimaryUnbalance">0.000 mA</strong>
         </article>
         <article>
-          <span>Bridge balance error</span>
-          <strong id="balanceError">0.0000%</strong>
+          <span>After swaps secondary</span>
+          <strong id="bestSecondaryUnbalance">0.000 mA</strong>
         </article>
+      </section>
+
+      <section class="visual-guide" aria-label="Physical capacitor location guide">
+        <div class="visual-heading">
+          <h2>Visual Guide</h2>
+          <p>
+            Physical view: C1/C2 are on the front side, C3/C4 are on the back side.
+            Each section has 6 groups: two groups side by side, three rows high.
+            Each group contains four parallel capacitor units.
+          </p>
+        </div>
+        <div class="rack-guide">
+          <section class="rack-face" aria-label="Front side">
+            <div class="face-title">Front</div>
+            <div class="face-stack">
+              <article class="physical-arm">
+                <header><strong>C1</strong><span>front top</span></header>
+                <div class="physical-groups">
+                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
+                </div>
+              </article>
+              <article class="physical-arm">
+                <header><strong>C2</strong><span>front bottom</span></header>
+                <div class="physical-groups">
+                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
+                </div>
+              </article>
+            </div>
+          </section>
+          <section class="rack-face" aria-label="Back side">
+            <div class="face-title">Back</div>
+            <div class="face-stack">
+              <article class="physical-arm">
+                <header><strong>C3</strong><span>back top</span></header>
+                <div class="physical-groups">
+                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
+                </div>
+              </article>
+              <article class="physical-arm">
+                <header><strong>C4</strong><span>back bottom</span></header>
+                <div class="physical-groups">
+                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
+                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section class="main-grid">
@@ -140,6 +211,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./app.js?v=template-black-arms-20260708"></script>
+    <script src="./app.js?v=ct-visual-guide-20260713"></script>
   </body>
 </html>

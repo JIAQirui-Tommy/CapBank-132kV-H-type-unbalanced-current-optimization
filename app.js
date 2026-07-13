@@ -19,14 +19,15 @@ const systemVoltageEl = document.querySelector("#systemVoltage");
 const voltageBasisEl = document.querySelector("#voltageBasis");
 const frequencyEl = document.querySelector("#frequency");
 const nominalCapEl = document.querySelector("#nominalCap");
+const ctRatioEl = document.querySelector("#ctRatio");
 const swapPairsEl = document.querySelector("#swapPairs");
 const fileInputEl = document.querySelector("#fileInput");
 const fileStatusEl = document.querySelector("#fileStatus");
 const downloadTemplateEl = document.querySelector("#downloadTemplate");
-const currentUnbalanceEl = document.querySelector("#currentUnbalance");
-const bestUnbalanceEl = document.querySelector("#bestUnbalance");
-const improvementEl = document.querySelector("#improvement");
-const balanceErrorEl = document.querySelector("#balanceError");
+const primaryUnbalanceEl = document.querySelector("#primaryUnbalance");
+const secondaryUnbalanceEl = document.querySelector("#secondaryUnbalance");
+const bestPrimaryUnbalanceEl = document.querySelector("#bestPrimaryUnbalance");
+const bestSecondaryUnbalanceEl = document.querySelector("#bestSecondaryUnbalance");
 const swapListEl = document.querySelector("#swapList");
 const depthTableEl = document.querySelector("#depthTable");
 const detailsEl = document.querySelector("#details");
@@ -172,11 +173,13 @@ function setFileStatus(message, isError = false) {
 
 function getSystem() {
   const kv = readNumber(systemVoltageEl, 132);
+  const ctRatio = Math.max(readNumber(ctRatioEl, 1), 0.000001);
   return {
     sourceVoltage: (voltageBasisEl.value === "phase" ? kv / Math.sqrt(3) : kv) * 1000,
     displayKv: kv,
     basis: voltageBasisEl.value,
     frequency: readNumber(frequencyEl, 50),
+    ctRatio,
   };
 }
 
@@ -222,6 +225,8 @@ function calculate(layout, system = getSystem()) {
   const i4 = cBottom > 0 ? totalCurrentA * (c4 / cBottom) : 0;
   const unbalanceA = Math.abs(i1 - i2);
   const unbalanceMA = unbalanceA * 1000;
+  const secondaryUnbalanceMA = unbalanceMA / system.ctRatio;
+  const secondaryUnbalanceA = unbalanceA / system.ctRatio;
   const balanceNumerator = c1 * c4 - c3 * c2;
   const balanceDenominator = c1 * c4 + c3 * c2;
   const balanceErrorPercent =
@@ -234,6 +239,8 @@ function calculate(layout, system = getSystem()) {
   return {
     unbalanceMA,
     unbalanceA,
+    secondaryUnbalanceMA,
+    secondaryUnbalanceA,
     armUf,
     armGroups,
     totalUf,
@@ -263,7 +270,7 @@ function renderPhaseOverview() {
       <button class="phase-summary${isActive}" type="button" data-phase-jump="${phase}">
         <span>${phase}</span>
         <strong>${formatMA(current.unbalanceMA)}</strong>
-        <small>best ${formatMA(best.unbalanceMA)}</small>
+        <small>sec ${formatMA(current.secondaryUnbalanceMA)}</small>
       </button>
     `;
   }).join("");
@@ -434,14 +441,6 @@ function renderDetails(result) {
   const rows = [
     ["Effective voltage", `${(result.system.sourceVoltage / 1000).toFixed(6)} kV`],
     ["C1 / C2 / C3 / C4", `${formatUf(result.armUf.C1)} / ${formatUf(result.armUf.C2)} / ${formatUf(result.armUf.C3)} / ${formatUf(result.armUf.C4)}`],
-    ["Top equivalent C1+C3", formatUf(result.armUf.C1 + result.armUf.C3)],
-    ["Bottom equivalent C2+C4", formatUf(result.armUf.C2 + result.armUf.C4)],
-    ["Total equivalent", formatUf(result.totalUf)],
-    ["Total current", formatA(result.totalCurrentA)],
-    ["I1 / I2", `${formatA(result.i1)} / ${formatA(result.i2)}`],
-    ["I3 / I4", `${formatA(result.i3)} / ${formatA(result.i4)}`],
-    ["C1*C4 - C3*C2", result.balanceNumerator.toExponential(6)],
-    ["Formula cross-check", formatMA(result.bridgeFormulaA * 1000)],
   ];
 
   detailsEl.innerHTML = rows
@@ -453,15 +452,11 @@ function updateSummary(bestState = lastBest) {
   syncFromInputs();
   const current = calculate(capacitors);
   const best = bestState ? calculate(bestState.layout) : current;
-  const improvement =
-    current.unbalanceMA > 0
-      ? ((current.unbalanceMA - best.unbalanceMA) / current.unbalanceMA) * 100
-      : 0;
 
-  currentUnbalanceEl.textContent = formatMA(current.unbalanceMA);
-  bestUnbalanceEl.textContent = formatMA(best.unbalanceMA);
-  improvementEl.textContent = `${Math.max(0, improvement).toFixed(1)}%`;
-  balanceErrorEl.textContent = formatPercent(current.balanceErrorPercent);
+  primaryUnbalanceEl.textContent = formatMA(current.unbalanceMA);
+  secondaryUnbalanceEl.textContent = formatMA(current.secondaryUnbalanceMA);
+  bestPrimaryUnbalanceEl.textContent = formatMA(best.unbalanceMA);
+  bestSecondaryUnbalanceEl.textContent = formatMA(best.secondaryUnbalanceMA);
 
   ARM_ORDER.forEach((arm) => {
     const el = document.querySelector(`#arm-${arm}-cap`);
@@ -618,10 +613,13 @@ function createRecord(bestState) {
     voltageKv: readNumber(systemVoltageEl, 132),
     voltageBasis: voltageBasisEl.value,
     frequency: readNumber(frequencyEl, 50),
+    ctRatio: getSystem().ctRatio,
     swapMode: swapPairsEl.value,
     recommendedPairs: swaps.length,
     beforeMA: before.unbalanceMA,
+    beforeSecondaryMA: before.secondaryUnbalanceMA,
     afterMA: after.unbalanceMA,
+    afterSecondaryMA: after.secondaryUnbalanceMA,
     improvement:
       before.unbalanceMA > 0 ? ((before.unbalanceMA - after.unbalanceMA) / before.unbalanceMA) * 100 : 0,
     rows: buildSwapRows(initial, swaps),
@@ -765,10 +763,13 @@ function exportRecord() {
     ["Voltage kV", lastRecord.voltageKv],
     ["Voltage Basis", lastRecord.voltageBasis],
     ["Frequency Hz", lastRecord.frequency],
+    ["CT Ratio X:1", lastRecord.ctRatio],
     ["Swap Mode", lastRecord.swapMode],
     ["Recommended Swap Pairs", lastRecord.recommendedPairs],
-    ["Before Unbalanced Current mA", lastRecord.beforeMA.toFixed(6)],
-    ["After Unbalanced Current mA", lastRecord.afterMA.toFixed(6)],
+    ["Before Primary Unbalanced Current mA", lastRecord.beforeMA.toFixed(6)],
+    ["Before Secondary Relay Current mA", lastRecord.beforeSecondaryMA.toFixed(6)],
+    ["After Primary Unbalanced Current mA", lastRecord.afterMA.toFixed(6)],
+    ["After Secondary Relay Current mA", lastRecord.afterSecondaryMA.toFixed(6)],
     ["Improvement %", lastRecord.improvement.toFixed(4)],
     [],
     ["Swap Pair", "Capacitor A", "A From", "A To", "A uF", "Capacitor B", "B From", "B To", "B uF"],
@@ -833,7 +834,7 @@ armsEl.addEventListener("input", () => {
   updateSummary();
 });
 
-[systemVoltageEl, voltageBasisEl, frequencyEl, nominalCapEl].forEach((el) => {
+[systemVoltageEl, voltageBasisEl, frequencyEl, nominalCapEl, ctRatioEl].forEach((el) => {
   el.addEventListener("input", () => updateSummary(lastBest));
   el.addEventListener("change", () => updateSummary(lastBest));
 });
