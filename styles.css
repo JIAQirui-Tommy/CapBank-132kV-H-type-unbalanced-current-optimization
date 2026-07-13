@@ -319,11 +319,11 @@ select {
 
 .physical-group {
   display: grid;
-  grid-template-columns: repeat(4, minmax(14px, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(4, minmax(20px, 1fr));
+  gap: 6px;
   align-items: center;
   justify-items: center;
-  min-height: 66px;
+  min-height: 86px;
   padding: 6px;
   border: 1px solid #dce5ee;
   border-radius: 6px;
@@ -341,8 +341,8 @@ select {
 
 .physical-group i {
   display: block;
-  width: min(18px, 100%);
-  height: 34px;
+  width: min(24px, 100%);
+  height: 54px;
   border: 2px solid #546679;
   border-radius: 5px;
   background: #fff;
@@ -354,8 +354,8 @@ select {
   content: "";
   position: absolute;
   left: 50%;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border: 2px solid #546679;
   border-radius: 50%;
   background: #fff;
@@ -363,11 +363,11 @@ select {
 }
 
 .physical-group i::before {
-  top: 4px;
+  top: 7px;
 }
 
 .physical-group i::after {
-  bottom: 4px;
+  bottom: 7px;
 }
 
 .metrics article {
@@ -977,13 +977,13 @@ code {
   }
 
   .physical-group {
-    min-height: 60px;
+    min-height: 78px;
     padding: 5px;
   }
 
   .physical-group i {
-    width: 16px;
-    height: 32px;
+    width: 20px;
+    height: 48px;
   }
 
   .physical-group i::before,
@@ -993,11 +993,11 @@ code {
   }
 
   .physical-group i::before {
-    top: 4px;
+    top: 7px;
   }
 
   .physical-group i::after {
-    bottom: 4px;
+    bottom: 7px;
   }
 
   label {
