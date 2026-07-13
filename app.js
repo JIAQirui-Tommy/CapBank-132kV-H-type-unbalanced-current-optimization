@@ -328,6 +328,31 @@ function renderLayout() {
   });
 }
 
+function renderVisualGuideLabels() {
+  document.querySelectorAll(".physical-arm").forEach((armEl, armIndex) => {
+    const arm = ARM_ORDER[armIndex];
+    const startId = armIndex * CAPS_PER_ARM + 1;
+    const endId = startId + CAPS_PER_ARM - 1;
+    const subtitle = armEl.querySelector("header span");
+    if (subtitle) {
+      const baseText = subtitle.dataset.baseText || subtitle.textContent.trim();
+      subtitle.dataset.baseText = baseText;
+      subtitle.textContent = `${baseText} | ${startId}-${endId}`;
+    }
+
+    armEl.querySelectorAll(".physical-group").forEach((groupEl, groupIndex) => {
+      const groupStart = startId + groupIndex * CAPS_PER_GROUP;
+      const groupEnd = groupStart + CAPS_PER_GROUP - 1;
+      const groupLabel = groupEl.querySelector("span");
+      if (groupLabel) groupLabel.textContent = `G${groupIndex + 1} | ${groupStart}-${groupEnd}`;
+
+      groupEl.querySelectorAll("i").forEach((capEl, slotIndex) => {
+        capEl.textContent = `${groupStart + slotIndex}`;
+      });
+    });
+  });
+}
+
 function syncFromInputs() {
   document.querySelectorAll("[data-index]").forEach((input) => {
     const index = Number.parseInt(input.dataset.index, 10);
@@ -905,5 +930,6 @@ phaseStates = Object.fromEntries(PHASE_ORDER.map((phase) => [phase, makePhaseSta
 loadPhaseState(currentPhase);
 setPhaseUi();
 renderLayout();
+renderVisualGuideLabels();
 updateSummary();
 setFileStatus(`Showing ${currentPhase}. Load Excel/CSV will fill ${currentPhase} only.`);
