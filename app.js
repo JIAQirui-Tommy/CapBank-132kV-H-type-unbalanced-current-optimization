@@ -32,6 +32,7 @@ const depthTableEl = document.querySelector("#depthTable");
 const detailsEl = document.querySelector("#details");
 const applyBestEl = document.querySelector("#applyBest");
 const exportCsvEl = document.querySelector("#exportCsv");
+const towerSvgGuideEl = document.querySelector("#towerSvgGuide");
 
 let capacitors = [];
 let lastBest = null;
@@ -328,29 +329,114 @@ function renderLayout() {
   });
 }
 
-function renderVisualGuideLabels() {
-  document.querySelectorAll(".physical-arm").forEach((armEl, armIndex) => {
-    const arm = ARM_ORDER[armIndex];
-    const startId = armIndex * CAPS_PER_ARM + 1;
-    const endId = startId + CAPS_PER_ARM - 1;
-    const subtitle = armEl.querySelector("header span");
-    if (subtitle) {
-      const baseText = subtitle.dataset.baseText || subtitle.textContent.trim();
-      subtitle.dataset.baseText = baseText;
-      subtitle.textContent = `${baseText} | ${startId}-${endId}`;
+function renderTowerSvgGuide() {
+  if (!towerSvgGuideEl) return;
+
+  const svg = [];
+  const width = 1500;
+  const height = 930;
+  const tierY = 78;
+  const tierGap = 130;
+  const capW = 36;
+  const capH = 64;
+  const capGap = 5;
+  const centerGap = 30;
+  const terminalTop = 17;
+  const terminalBottom = 47;
+  const sidePad = 26;
+  const stroke = "#1f2933";
+  const tierWidth = capW * 8 + capGap * 6 + centerGap;
+  const tierTopY = (tier) => tierY + tier * tierGap;
+  const line = (x1, y1, x2, y2, extra = "") =>
+    svg.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${extra} />`);
+
+  function drawCap(x, y, label) {
+    svg.push(`<rect x="${x}" y="${y}" width="${capW}" height="${capH}" rx="2" />`);
+    svg.push(`<circle cx="${x + capW / 2}" cy="${y + terminalTop}" r="7" />`);
+    svg.push(`<circle cx="${x + capW / 2}" cy="${y + terminalBottom}" r="7" />`);
+    svg.push(`<text class="cap-number" x="${x + capW / 2}" y="${y + capH / 2}">${label}</text>`);
+  }
+
+  function drawSectionLabel(x, y1, y2, title, detail) {
+    line(x, y1, x, y2);
+    line(x, y1, x + 20, y1);
+    line(x, y2, x + 20, y2);
+    svg.push(`<text class="section-title" x="${x - 38}" y="${(y1 + y2) / 2 - 14}">${title}</text>`);
+    svg.push(`<text class="section-detail" x="${x - 38}" y="${(y1 + y2) / 2 + 12}">${detail}</text>`);
+  }
+
+  function drawSupport(x) {
+    for (let tier = 0; tier < 5; tier += 1) {
+      const y1 = tierTopY(tier) + capH + 12;
+      const y2 = tierTopY(tier + 1) - 12;
+      line(x, y1, x, y2);
+      const mid = (y1 + y2) / 2;
+      [mid - 18, mid, mid + 18].forEach((y) => {
+        svg.push(`<ellipse cx="${x}" cy="${y}" rx="14" ry="5" />`);
+      });
+    }
+  }
+
+  function drawTower(towerX, faceName, startNumber, topSection, bottomSection) {
+    const capX = (slot) =>
+      towerX + slot * (capW + capGap) + (slot >= 4 ? centerGap - capGap : 0);
+    const capCenterX = (slot) => capX(slot) + capW / 2;
+    const topY = (tier) => tierTopY(tier) + terminalTop;
+    const bottomY = (tier) => tierTopY(tier) + terminalBottom;
+
+    svg.push(`<text class="face-label" x="${towerX + tierWidth / 2}" y="32">${faceName}</text>`);
+
+    for (let tier = 0; tier < 6; tier += 1) {
+      const y = tierTopY(tier);
+      svg.push(`<rect class="tower-tier-frame" x="${towerX - 14}" y="${y - 12}" width="${tierWidth + 28}" height="${capH + 24}" rx="3" />`);
+      for (let slot = 0; slot < 8; slot += 1) {
+        drawCap(capX(slot), y, startNumber + tier * 8 + slot);
+      }
+
+      line(capCenterX(0), topY(tier), capCenterX(3), topY(tier));
+      line(capCenterX(0), bottomY(tier), capCenterX(3), bottomY(tier));
+      line(capCenterX(4), topY(tier), capCenterX(7), topY(tier));
+      line(capCenterX(4), bottomY(tier), capCenterX(7), bottomY(tier));
+
+      if ([0, 2, 4].includes(tier)) {
+        line(capCenterX(3), bottomY(tier), capCenterX(4), topY(tier));
+      } else {
+        line(capCenterX(3), topY(tier), capCenterX(4), bottomY(tier));
+      }
     }
 
-    armEl.querySelectorAll(".physical-group").forEach((groupEl, groupIndex) => {
-      const groupStart = startId + groupIndex * CAPS_PER_GROUP;
-      const groupEnd = groupStart + CAPS_PER_GROUP - 1;
-      const groupLabel = groupEl.querySelector("span");
-      if (groupLabel) groupLabel.textContent = `G${groupIndex + 1} | ${groupStart}-${groupEnd}`;
+    drawSupport(towerX - sidePad);
+    drawSupport(towerX + tierWidth + sidePad);
 
-      groupEl.querySelectorAll("i").forEach((capEl, slotIndex) => {
-        capEl.textContent = `${groupStart + slotIndex}`;
-      });
-    });
-  });
+    line(towerX - 96, topY(0), capCenterX(0), topY(0));
+    line(capCenterX(7), bottomY(0), capCenterX(7), topY(1));
+    line(capCenterX(0), bottomY(1), capCenterX(0), topY(2));
+    line(capCenterX(7), bottomY(2), capCenterX(7), topY(3));
+
+    line(towerX - 96, bottomY(5), capCenterX(0), bottomY(5));
+    line(capCenterX(7), topY(5), capCenterX(7), bottomY(4));
+    line(capCenterX(0), topY(4), capCenterX(0), bottomY(3));
+
+    line(capCenterX(7), topY(3), towerX + tierWidth + 86, topY(3));
+
+    drawSectionLabel(towerX - 72, tierTopY(0) - 12, tierTopY(2) + capH + 12, topSection, `${startNumber}-${startNumber + 23}`);
+    drawSectionLabel(towerX - 72, tierTopY(3) - 12, tierTopY(5) + capH + 12, bottomSection, `${startNumber + 24}-${startNumber + 47}`);
+  }
+
+  svg.push(`
+    <svg viewBox="0 0 ${width} ${height}" aria-hidden="true">
+      <g fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  `);
+
+  drawTower(260, "Front", 1, "C1 front top", "C2 front bottom");
+  drawTower(930, "Rear", 49, "C3 rear top", "C4 rear bottom");
+
+  svg.push(`
+      </g>
+    </svg>
+  `);
+
+  towerSvgGuideEl.innerHTML = svg.join("");
 }
 
 function syncFromInputs() {
@@ -930,6 +1016,6 @@ phaseStates = Object.fromEntries(PHASE_ORDER.map((phase) => [phase, makePhaseSta
 loadPhaseState(currentPhase);
 setPhaseUi();
 renderLayout();
-renderVisualGuideLabels();
+renderTowerSvgGuide();
 updateSummary();
 setFileStatus(`Showing ${currentPhase}. Load Excel/CSV will fill ${currentPhase} only.`);

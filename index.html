@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>132kV H Type 96 Capacitor Bank Unbalanced Current</title>
-    <link rel="stylesheet" href="./styles.css?v=unified-physical-labels-20260713" />
+    <link rel="stylesheet" href="./styles.css?v=svg-tower-guide-20260714" />
   </head>
   <body>
     <main class="app">
@@ -89,67 +89,11 @@
         <div class="visual-heading">
           <h2>Visual Guide</h2>
           <p>
-            Physical view: C1/C2 are on the front side, C3/C4 are on the rear side.
-            Each section has 6 groups: two groups side by side, three rows high.
-            Each group contains four parallel capacitor units.
+            Engineering SVG view of two separated 6-tier towers: Front contains
+            C1/C2 capacitors 1-48, Rear contains C3/C4 capacitors 49-96.
           </p>
         </div>
-        <div class="rack-guide">
-          <section class="rack-face" aria-label="Front side">
-            <div class="face-title">Front</div>
-            <div class="face-stack">
-              <article class="physical-arm">
-                <header><strong>C1</strong><span>front top</span></header>
-                <div class="physical-groups">
-                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
-                </div>
-              </article>
-              <article class="physical-arm">
-                <header><strong>C2</strong><span>front bottom</span></header>
-                <div class="physical-groups">
-                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
-                </div>
-              </article>
-            </div>
-          </section>
-          <section class="rack-face" aria-label="Rear side">
-            <div class="face-title">Rear</div>
-            <div class="face-stack">
-              <article class="physical-arm">
-                <header><strong>C3</strong><span>rear top</span></header>
-                <div class="physical-groups">
-                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
-                </div>
-              </article>
-              <article class="physical-arm">
-                <header><strong>C4</strong><span>rear bottom</span></header>
-                <div class="physical-groups">
-                  <div class="physical-group"><span>G1</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G2</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G3</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G4</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G5</span><i></i><i></i><i></i><i></i></div>
-                  <div class="physical-group"><span>G6</span><i></i><i></i><i></i><i></i></div>
-                </div>
-              </article>
-            </div>
-          </section>
-        </div>
+        <div id="towerSvgGuide" class="tower-svg-guide" role="img" aria-label="Six-tier 4P2S capacitor tower topology"></div>
       </section>
 
       <section class="main-grid">
@@ -204,6 +148,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="./app.js?v=unified-physical-labels-20260713"></script>
+    <script src="./app.js?v=svg-tower-guide-20260714"></script>
   </body>
 </html>

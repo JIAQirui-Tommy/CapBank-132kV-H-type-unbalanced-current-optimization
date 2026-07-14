@@ -241,140 +241,66 @@ select {
   text-align: right;
 }
 
-.rack-guide {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.rack-face {
-  border: 2px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fbfcfd;
-}
-
-.rack-face:first-child {
-  border-color: #1b3f5f;
-}
-
-.rack-face:last-child {
-  border-color: #3f3421;
-}
-
-.face-title {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-  color: #fff;
-  font-weight: 900;
-  text-align: center;
-}
-
-.rack-face:first-child .face-title {
-  background: #1b3f5f;
-}
-
-.rack-face:last-child .face-title {
-  background: #3f3421;
-}
-
-.face-stack {
-  display: grid;
-  gap: 10px;
-  padding: 10px;
-}
-
-.physical-arm {
-  border: 1px solid #e2e8ef;
+.tower-svg-guide {
+  overflow-x: auto;
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  overflow: hidden;
 }
 
-.physical-arm header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-  padding: 8px 10px;
-  border-bottom: 1px solid #ecf0f4;
+.tower-svg-guide svg {
+  display: block;
+  width: 100%;
+  min-width: 1180px;
+  height: auto;
 }
 
-.physical-arm header strong {
-  font-size: 18px;
+.tower-svg-guide rect,
+.tower-svg-guide circle,
+.tower-svg-guide ellipse,
+.tower-svg-guide line {
+  vector-effect: non-scaling-stroke;
 }
 
-.physical-arm header span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.physical-groups {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px 8px;
-  padding: 8px;
-}
-
-.physical-group {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(20px, 1fr));
-  gap: 6px;
-  align-items: center;
-  justify-items: center;
-  min-height: 86px;
-  padding: 6px;
-  border: 1px solid #dce5ee;
-  border-radius: 6px;
-  background: #f8fafc;
-  position: relative;
-}
-
-.physical-group span {
-  grid-column: 1 / -1;
-  color: var(--muted);
+.tower-svg-guide .cap-number {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 3px;
+  paint-order: stroke fill;
   font-size: 11px;
   font-weight: 900;
-  justify-self: start;
+  text-anchor: middle;
+  dominant-baseline: middle;
 }
 
-.physical-group i {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(24px, 100%);
-  height: 54px;
-  border: 2px solid #546679;
-  border-radius: 5px;
-  background: #fff;
-  color: var(--ink);
-  font-size: 9px;
-  font-style: normal;
+.tower-svg-guide .section-title,
+.tower-svg-guide .section-detail,
+.tower-svg-guide .face-label {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 4px;
+  paint-order: stroke fill;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.tower-svg-guide .section-title {
+  font-size: 22px;
   font-weight: 900;
-  line-height: 1;
-  position: relative;
 }
 
-.physical-group i::before,
-.physical-group i::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border: 2px solid #546679;
-  border-radius: 50%;
-  background: #fff;
-  transform: translateX(-50%);
+.tower-svg-guide .section-detail {
+  font-size: 13px;
+  font-weight: 800;
 }
 
-.physical-group i::before {
-  top: 7px;
+.tower-svg-guide .face-label {
+  font-size: 28px;
+  font-weight: 900;
 }
 
-.physical-group i::after {
-  bottom: 7px;
+.tower-tier-frame {
+  stroke-width: 3;
 }
 
 .metrics article {
@@ -763,12 +689,6 @@ code {
   }
 }
 
-@media (orientation: landscape) and (min-width: 760px) {
-  .rack-guide {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 920px) {
   body {
     background: #eef2f5;
@@ -832,10 +752,6 @@ code {
   .visual-heading p {
     max-width: none;
     text-align: left;
-  }
-
-  .rack-guide {
-    grid-template-columns: 1fr;
   }
 
   .settings label:nth-child(2) {
@@ -972,40 +888,6 @@ code {
 
   .visual-guide {
     padding: 11px;
-  }
-
-  .face-stack {
-    padding: 8px;
-  }
-
-  .physical-groups {
-    gap: 6px;
-    padding: 7px;
-  }
-
-  .physical-group {
-    min-height: 78px;
-    padding: 5px;
-  }
-
-  .physical-group i {
-    width: 20px;
-    height: 48px;
-    font-size: 8px;
-  }
-
-  .physical-group i::before,
-  .physical-group i::after {
-    width: 7px;
-    height: 7px;
-  }
-
-  .physical-group i::before {
-    top: 7px;
-  }
-
-  .physical-group i::after {
-    bottom: 7px;
   }
 
   label {
